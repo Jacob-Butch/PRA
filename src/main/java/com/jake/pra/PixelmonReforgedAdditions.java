@@ -33,7 +33,7 @@ public class PixelmonReforgedAdditions
 {
     public static final String MODID = "praddtions";
     public static final String NAME = "Pixelmon Reforged Additions";
-    public static final String VERSION = "1.0.3";
+    public static final String VERSION = "1.0.0";
     public static final String PREFIX = "[PRA] ";
     public static final Logger LOGGER = LogManager.getLogger("PRAdditions");
     @Instance(MODID)
