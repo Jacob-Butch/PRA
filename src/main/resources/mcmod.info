@@ -1,0 +1,16 @@
+[
+{
+  "modid": "pradditions",
+  "name": "Pixelmon Reforged Additions",
+  "description": "Adds in a small assortment of Pixelmon related commands to make life easier.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Jake"],
+  "credits": "The Pixelmon folks for making the Pixelmon mod.",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
