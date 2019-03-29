@@ -84,6 +84,10 @@ public class PRAcommand extends CommandBase implements ICommand {
                         PokeCry pc = new PokeCry();
                         CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, pc.getUsage(sender));
                         break;
+                    case "release":
+                        Release rl = new Release();
+                        CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, rl.getUsage(sender));
+                        break;
                     default:
                         CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "Invalid argument, please try again.");
                         break;
@@ -141,6 +145,7 @@ public class PRAcommand extends CommandBase implements ICommand {
             args2.add("reroll");
             args2.add("clearparty");
             args2.add("pokecry");
+            args2.add("release");
             args2.add("legendRerollKeepIVs");
 
             return getListOfStringsMatchingLastWord(args, args2);
