@@ -1,10 +1,6 @@
 package com.jake.pra;
 
-import com.jake.pra.Commands.PokeCry;
-import com.jake.pra.Commands.RandomIV;
-import com.jake.pra.Commands.PRAcommand;
-import com.jake.pra.Commands.Reroll;
-import com.jake.pra.Commands.ClearParty;
+import com.jake.pra.Commands.*;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.Config.LangKey;
 import net.minecraftforge.common.config.Config.Comment;
@@ -33,7 +29,7 @@ public class PixelmonReforgedAdditions
 {
     public static final String MODID = "praddtions";
     public static final String NAME = "Pixelmon Reforged Additions";
-    public static final String VERSION = "1.0.0";
+    public static final String VERSION = "1.1";
     public static final String PREFIX = "[PRA] ";
     public static final Logger LOGGER = LogManager.getLogger("PRAdditions");
     @Instance(MODID)
@@ -72,6 +68,7 @@ public class PixelmonReforgedAdditions
         event.registerServerCommand(new ClearParty());
         event.registerServerCommand(new PRAcommand());
         event.registerServerCommand(new PokeCry());
+        event.registerServerCommand(new Release());
     }
 
     @Config(modid = PixelmonReforgedAdditions.MODID, type = Type.INSTANCE)

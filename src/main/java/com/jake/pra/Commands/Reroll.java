@@ -53,8 +53,6 @@ public class Reroll extends CommandBase implements ICommand {
         }
         else {
             try {
-
-
                 EntityPlayerMP player = getPlayer(server, sender, args[0]);
                 PlayerPartyStorage partyStorage = Pixelmon.storageManager.getParty(player);
                 int miniv, maxiv;                       //min and max iv values

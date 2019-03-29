@@ -1,6 +1,7 @@
 package com.jake.pra.Commands;
 
 import com.google.common.collect.Lists;
+import com.pixelmonmod.pixelmon.comm.CommandChatHandler;
 import com.pixelmonmod.pixelmon.enums.EnumSpecies;
 import net.minecraft.command.*;
 import net.minecraft.util.SoundCategory;
@@ -14,6 +15,7 @@ import net.minecraft.network.play.server.SPacketCustomSound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextFormatting;
 
 public class PokeCry extends CommandBase implements ICommand
 {
@@ -81,7 +83,10 @@ public class PokeCry extends CommandBase implements ICommand
             }
 
             player.connection.sendPacket(new SPacketCustomSound(sound, soundcategory, x, y, z, (float)volume, (float)pitch));
-            notifyCommandListener(sender, this, "Commands.playsound.success", new Object[] {sound, player.getName()});
+            String[] players = server.getOnlinePlayerNames();
+            if(getListOfStringsMatchingLastWord(players, server.getOnlinePlayerNames()).contains(sender.getName())) {
+                CommandChatHandler.sendFormattedChat(sender, TextFormatting.GREEN, "Played " + args[1] + "'s cry to " + args[0]);
+            }
         }
     }
 
