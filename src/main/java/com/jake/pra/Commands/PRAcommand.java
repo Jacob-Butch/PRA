@@ -3,14 +3,10 @@ package com.jake.pra.Commands;
 import com.google.common.collect.Lists;
 import com.jake.pra.PixelmonReforgedAdditions;
 import com.pixelmonmod.pixelmon.comm.CommandChatHandler;
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommand;
-import net.minecraft.command.ICommandSender;
+import net.minecraft.command.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.Config.Type;
 import net.minecraftforge.common.config.ConfigManager;
 
@@ -19,8 +15,9 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.jake.pra.PixelmonReforgedAdditions.MODID;
+import static com.jake.pra.Info.PRA.MODID;
 
+@SuppressWarnings("ConstantConditions")
 public class PRAcommand extends CommandBase implements ICommand {
     private final List<String> aliases = Lists.newArrayList();
 
@@ -51,16 +48,18 @@ public class PRAcommand extends CommandBase implements ICommand {
     {
         if(args.length < 1)
         {
-            CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, getUsage(sender));
+            throw new WrongUsageException(this.getUsage(sender));
         }
         else if(args[0].equals("help"))
         {
             if(args.length == 1) {
                 CommandChatHandler.sendFormattedChat(sender, TextFormatting.BLUE, "=-=-= " + TextFormatting.YELLOW + "List of PRA Commands" + TextFormatting.BLUE + " =-=-=");
                 CommandChatHandler.sendFormattedChat(sender, TextFormatting.BLUE, "=    " + TextFormatting.WHITE + "-" + TextFormatting.GREEN + "/randomiv");
-                CommandChatHandler.sendFormattedChat(sender, TextFormatting.BLUE, "=    " + TextFormatting.WHITE + "-" + TextFormatting.GREEN + "/reroll");
+                CommandChatHandler.sendFormattedChat(sender, TextFormatting.BLUE, "=    " + TextFormatting.WHITE + "-" + TextFormatting.GREEN + "/rerolliv");
                 CommandChatHandler.sendFormattedChat(sender, TextFormatting.BLUE, "=    " + TextFormatting.WHITE + "-" + TextFormatting.GREEN + "/clearparty");
                 CommandChatHandler.sendFormattedChat(sender, TextFormatting.BLUE, "=    " + TextFormatting.WHITE + "-" + TextFormatting.GREEN + "/pokecry");
+                CommandChatHandler.sendFormattedChat(sender, TextFormatting.BLUE, "=    " + TextFormatting.WHITE + "-" + TextFormatting.GREEN + "/pokesound");
+                CommandChatHandler.sendFormattedChat(sender, TextFormatting.BLUE, "=    " + TextFormatting.WHITE + "-" + TextFormatting.GREEN + "/release");
                 CommandChatHandler.sendFormattedChat(sender, TextFormatting.BLUE, "============================");
                 CommandChatHandler.sendFormattedChat(sender, TextFormatting.YELLOW,"Do '/help <commandname>' to get usage of a command.");
             }
@@ -72,8 +71,8 @@ public class PRAcommand extends CommandBase implements ICommand {
                         RandomIV riv = new RandomIV();
                         CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, riv.getUsage(sender));
                         break;
-                    case "reroll":
-                        Reroll rr = new Reroll();
+                    case "rerolliv":
+                        RerollIV rr = new RerollIV();
                         CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, rr.getUsage(sender));
                         break;
                     case "clearparty":
@@ -83,6 +82,10 @@ public class PRAcommand extends CommandBase implements ICommand {
                     case "pokecry":
                         PokeCry pc = new PokeCry();
                         CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, pc.getUsage(sender));
+                        break;
+                    case "pokesound":
+                        PokeSound ps = new PokeSound();
+                        CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, ps.getUsage(sender));
                         break;
                     case "release":
                         Release rl = new Release();
@@ -132,7 +135,7 @@ public class PRAcommand extends CommandBase implements ICommand {
     public List<String> getTabCompletions(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args, @Nullable BlockPos targetPos){
         if(args.length == 1)
         {
-            List<String> args1 = new ArrayList();
+            List<String> args1 = new ArrayList<>();
             args1.add("setConfig");
             args1.add("help");
 
@@ -140,19 +143,20 @@ public class PRAcommand extends CommandBase implements ICommand {
         }
         if(args.length == 2)
         {
-            List<String> args2 = new ArrayList();
+            List<String> args2 = new ArrayList<>();
             args2.add("randomiv");
             args2.add("reroll");
             args2.add("clearparty");
             args2.add("pokecry");
             args2.add("release");
+            args2.add("pokesound");
             args2.add("legendRerollKeepIVs");
 
             return getListOfStringsMatchingLastWord(args, args2);
         }
         if(args.length == 3)
         {
-            List<String> args3 = new ArrayList();
+            List<String> args3 = new ArrayList<>();
             args3.add("true");
             args3.add("false");
 

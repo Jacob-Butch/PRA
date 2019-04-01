@@ -10,10 +10,7 @@ import com.pixelmonmod.pixelmon.enums.EnumSpecies;
 import com.pixelmonmod.pixelmon.enums.items.EnumPokeballs;
 import com.pixelmonmod.pixelmon.storage.PlayerPartyStorage;
 import com.google.common.collect.Lists;
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommand;
-import net.minecraft.command.ICommandSender;
+import net.minecraft.command.*;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
@@ -52,17 +49,22 @@ public class RandomIV extends CommandBase implements ICommand {
 
     /* getTabCompletionOptions */
     public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args) throws CommandException {
+        if(args.length < 4)
+        {
+            throw new WrongUsageException(this.getUsage(sender));
+        }
         int miniv, maxiv;                       //min and max iv values
         int hp, atk, def, spatk, spdef, spd;    //iv values
         String  pokemon;                 //target pokemon
-        String nature, ability, size;           //specified nature, ability, and size of pokemon
         EnumSpecies name;
 
         pokemon = args[1];
-        if(args[2].equals(args[3])) {
+        if(args[2].equals(args[3]))
+        {
             hp = atk = def = spatk = spdef = spd = Integer.parseInt(args[3]);
         }
-        else {
+        else
+        {
             miniv = Integer.parseInt(args[2]);
             maxiv = Integer.parseInt(args[3]);
             hp    = (int)(Math.random()*((maxiv-miniv)+1))+miniv;
@@ -75,9 +77,7 @@ public class RandomIV extends CommandBase implements ICommand {
         int i = args.length;
         int n = i+6;
         String[] specs = new String[n];
-        for(int x = 0; x < args.length; x++){
-            specs[x] = args[x];
-        }
+        System.arraycopy(args, 0, specs, 0, args.length);
         specs[i] = ("ivhp:"+hp);
         specs[i+1] = ("ivattack:"+atk);
         specs[i+2] = ("ivdefence:"+def);
@@ -86,58 +86,68 @@ public class RandomIV extends CommandBase implements ICommand {
         specs[i+5] = ("ivspeed:"+spd);
 
         EntityPlayerMP player = getPlayer(server, sender, args[0]);
-        if(pokemon.equals("random")) {
+        if(pokemon.equals("random"))
+        {
             int legendchance;
             java.util.Random rand = new java.util.Random();
             legendchance = rand.nextInt(100);
-            if(legendchance > 0) {
+            if(legendchance > 0)
+            {
                 name = EnumSpecies.randomPoke();
             }
-            else {
+            else
+            {
                 int sizeleg = EnumSpecies.legendaries.size();
                 int random = (new Random()).nextInt(sizeleg);
-                name = EnumSpecies.getFromNameAnyCase((String) EnumSpecies.legendaries.get(random));
+                name = EnumSpecies.getFromNameAnyCase(EnumSpecies.legendaries.get(random));
             }
             Pokemon p = Pixelmon.pokemonFactory.create(name);
             PokemonSpec spec = PokemonSpec.from(specs);
             p.setCaughtBall(EnumPokeballs.PokeBall);
             spec.apply(p);
             PlayerPartyStorage storage = Pixelmon.storageManager.getParty(player);
-            if (BattleRegistry.getBattle(player) == null) {
+            if (BattleRegistry.getBattle(player) == null)
+            {
                 storage.add(p);
-            } else {
+            } else
+            {
                 PCStorage pcStorage = Pixelmon.storageManager.getPCForPlayer(player);
                 pcStorage.add(p);
             }
         }
-        else {
+        else
+        {
             name = EnumSpecies.getFromNameAnyCase(pokemon);
             Pokemon p = Pixelmon.pokemonFactory.create(name);
             PokemonSpec spec = PokemonSpec.from(specs);
             p.setCaughtBall(EnumPokeballs.PokeBall);
             spec.apply(p);
             PlayerPartyStorage storage = Pixelmon.storageManager.getParty(player);
-            if (BattleRegistry.getBattle(player) == null) {
+            if (BattleRegistry.getBattle(player) == null)
+            {
                 storage.add(p);
-            } else {
+            } else
+            {
                 PCStorage pcStorage = Pixelmon.storageManager.getPCForPlayer(player);
                 pcStorage.add(p);
             }
-            CommandChatHandler.sendFormattedChat(sender, TextFormatting.GREEN, "You were given a " + p.getDisplayName() + "!", new Object[0]);
+            CommandChatHandler.sendFormattedChat(sender, TextFormatting.GREEN, "You were given a " + p.getDisplayName() + "!");
         }
 
     }
 
     @Nonnull
     public List<String> getTabCompletions(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args, @Nullable BlockPos targetPos){
-        if (args.length == 1) {
+        if (args.length == 1)
+        {
             return getListOfStringsMatchingLastWord(args, server.getOnlinePlayerNames());
-        } else {
-            List<String> pokes = new ArrayList();
+        }
+        else
+        {
+            List<String> pokes = new ArrayList<>();
             EnumSpecies[] dex = EnumSpecies.values();
-            int x = dex.length;
-            for(int y = 0; y < x; ++y) {
-                EnumSpecies poke = dex[y];
+            for (EnumSpecies poke : dex)
+            {
                 pokes.add(poke.name);
             }
             return getListOfStringsMatchingLastWord(args, pokes);

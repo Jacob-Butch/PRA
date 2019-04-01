@@ -6,10 +6,7 @@ import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.storage.PCStorage;
 import com.pixelmonmod.pixelmon.comm.CommandChatHandler;
 import com.pixelmonmod.pixelmon.storage.PlayerPartyStorage;
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommand;
-import net.minecraft.command.ICommandSender;
+import net.minecraft.command.*;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
@@ -24,11 +21,13 @@ import static com.pixelmonmod.pixelmon.enums.EnumSpecies.legendaries;
 
 
 public class Release extends CommandBase implements ICommand {
-    private static HashMap<UUID, Integer> confirmRelease = new HashMap();
+    private static HashMap<UUID, Integer> confirmRelease = new HashMap<>();
     private final List<String> aliases = Lists.newArrayList( "rl");
 
     public Release() {
     }
+
+    public int getRequiredPermissionLevel() { return 2; }
 
     /* getCommandName */
     @Nonnull
@@ -54,7 +53,7 @@ public class Release extends CommandBase implements ICommand {
         EntityPlayerMP player;
         if((args.length < 1) || (args.length > 3))
         {
-            CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "Invalid amount of arguments, try again.");
+            throw new WrongUsageException(this.getUsage(sender));
         }
         else if(args.length == 1)
         {
@@ -79,7 +78,8 @@ public class Release extends CommandBase implements ICommand {
                 clearBoxSlot(sender, player, box, slot);
             }
         }
-        else {
+        else
+        {
             player = getPlayer(server, sender, args[0]);
             box = Integer.parseInt(args[1]);
             slot = Integer.parseInt(args[2]);
@@ -111,9 +111,11 @@ public class Release extends CommandBase implements ICommand {
                 confirmRelease.remove(player.getUniqueID());
             }
             else {
-                CommandChatHandler.sendFormattedChat(sender, TextFormatting.BLUE, "Is legendary");
                 confirmRelease.put(player.getUniqueID(), 0);
-                CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "Warning: The " + pokemon.getDisplayName() + " in this slot is a legendary pokemon.");
+                if(pokemon.isShiny())
+                    CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "Warning: The " + pokemon.getDisplayName() + " in this slot is a shiny legendary pokemon.");
+                else
+                    CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "Warning: The " + pokemon.getDisplayName() + " in this slot is a legendary pokemon.");
                 CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "Run '/release' again on it to continue.");
                 return;
             }
@@ -125,7 +127,6 @@ public class Release extends CommandBase implements ICommand {
                 confirmRelease.remove(player.getUniqueID());
             }
             else {
-                CommandChatHandler.sendFormattedChat(sender, TextFormatting.BLUE, "Is shiny");
                 confirmRelease.put(player.getUniqueID(), 0);
                 CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "Warning: The " + pokemon.getDisplayName() + " in this slot is shiny.");
                 CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "Run '/release' again on it to continue.");
@@ -149,22 +150,24 @@ public class Release extends CommandBase implements ICommand {
             {
                 confirmRelease.remove(player.getUniqueID());
             }
-            else {
-                CommandChatHandler.sendFormattedChat(sender, TextFormatting.BLUE, "Is legendary");
+            else
+            {
                 confirmRelease.put(player.getUniqueID(), 0);
-                CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "Warning: The " + pokemon.getDisplayName() + " in this slot is a legendary pokemon.");
+                if(pokemon.isShiny())
+                    CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "Warning: The " + pokemon.getDisplayName() + " in this slot is a shiny legendary pokemon.");
+                else
+                    CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "Warning: The " + pokemon.getDisplayName() + " in this slot is a legendary pokemon.");
                 CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "Run '/release' again on it to continue.");
                 return;
             }
         }
-        if(pokemon.isShiny())
+        else if(pokemon.isShiny())
         {
             if (confirmRelease.keySet().contains(player.getUniqueID()))
             {
                 confirmRelease.remove(player.getUniqueID());
             }
             else {
-                CommandChatHandler.sendFormattedChat(sender, TextFormatting.BLUE, "Is shiny");
                 confirmRelease.put(player.getUniqueID(), 0);
                 CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "Warning: The " + pokemon.getDisplayName() + " in this slot is shiny.");
                 CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "Run '/release' again on it to continue.");
