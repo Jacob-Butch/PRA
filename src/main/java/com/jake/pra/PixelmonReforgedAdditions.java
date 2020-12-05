@@ -1,6 +1,7 @@
 package com.jake.pra;
 
-import com.jake.pra.Commands.*;
+import com.jake.pra.command.*;
+import com.jake.pra.command.permissions.EnumPerms;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.Config.LangKey;
 import net.minecraftforge.common.config.Config.Comment;
@@ -12,47 +13,25 @@ import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-import static com.jake.pra.Info.PRA.*;
-import static net.minecraftforge.common.MinecraftForge.EVENT_BUS;
-
-@Mod(
-        modid = MODID,
-        name = NAME,
-        version = VERSION,
-        serverSideOnly = true,
-        dependencies = "required-after:pixelmon",
-        acceptableRemoteVersions = "*"
+@Mod(modid = "pradditions", name = "PRAdditions", version = "1.5", serverSideOnly = true,
+        dependencies = "required-after:pixelmon", acceptableRemoteVersions = "*"
 )
-public class PixelmonReforgedAdditions
-{
-    @EventHandler
-    public void preInit(FMLPreInitializationEvent event) {
-        LOGGER.info("==================================");
-        LOGGER.info("||  Loading Pixelmon Reforged Additions...  ||");
-        LOGGER.info("==================================");
-        EVENT_BUS.register(this);
-    }
+public class PixelmonReforgedAdditions {
 
     @EventHandler
     public void init(FMLInitializationEvent event) {
-        ConfigManager.load(MODID, Type.INSTANCE);
-        ConfigManager.sync(MODID, Type.INSTANCE);
-
-    }
-
-    @EventHandler
-    public void postInit(FMLPostInitializationEvent event){
-        LOGGER.info("=================================");
-        LOGGER.info("||   Pixelmon Reforged Additions Loaded   ||");
-        LOGGER.info("=================================");
+        ConfigManager.load("pradditions", Type.INSTANCE);
+        ConfigManager.sync("pradditions", Type.INSTANCE);
     }
 
     @EventHandler
     public void serverStarting(FMLServerStartingEvent event) {
-        registerCommands(event);
+        this.registerCommands(event);
+        EnumPerms.registerPermissions();
     }
 
     private void registerCommands(FMLServerStartingEvent event){
+        // Register commands
         event.registerServerCommand(new RandomIV());
         event.registerServerCommand(new RerollIV());
         event.registerServerCommand(new ClearParty());
@@ -60,9 +39,11 @@ public class PixelmonReforgedAdditions
         event.registerServerCommand(new PokeCry());
         event.registerServerCommand(new Release());
         event.registerServerCommand(new PokeSound());
+        event.registerServerCommand(new ClearBox());
     }
 
-    @Config(modid = MODID, type = Type.INSTANCE)
+    // Plugin config
+    @Config(modid = "pradditions", type = Type.INSTANCE)
     @LangKey("pra.config.title")
     public static class CONFIG {
         @Comment("When '/reroll' is used on a legend, that legend will still have 3 IVs that are 31. (Set to false to disable this)")
@@ -74,8 +55,8 @@ public class PixelmonReforgedAdditions
 
     @SubscribeEvent
     public static void onConfigChanged(final OnConfigChangedEvent event) {
-        if (event.getModID().equals(MODID)) {
-            ConfigManager.sync(MODID, Type.INSTANCE);
+        if (event.getModID().equals("pradditions")) {
+            ConfigManager.sync("pradditions", Type.INSTANCE);
         }
     }
 }
