@@ -1,7 +1,6 @@
 package com.jake.pra.command;
 
 import com.google.common.collect.Lists;
-import com.jake.pra.command.permissions.EnumPerms;
 import com.pixelmonmod.pixelmon.Pixelmon;
 import com.pixelmonmod.pixelmon.api.storage.PCBox;
 import com.pixelmonmod.pixelmon.api.storage.PCStorage;
@@ -20,10 +19,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-public class ClearBox extends CommandBase implements ICommand
-{
+public class ClearBox extends CommandBase implements ICommand {
+
     private static final HashMap<UUID, Integer> confirmClearBox = new HashMap<>();
-    private final List<String> aliases = Lists.newArrayList( "clearb");
 
     public int getRequiredPermissionLevel() { return 2; }
 
@@ -42,14 +40,11 @@ public class ClearBox extends CommandBase implements ICommand
     /* getCommandAliases */
     @Nonnull
     public List<String> getAliases() {
-        return this.aliases;
+        return Lists.newArrayList( "cb");
     }
 
     /* getTabCompletionOptions */
     public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args) throws CommandException {
-        if(!EnumPerms.hasPermission(EnumPerms.clearbox, sender)){
-            throw new WrongUsageException("You do not have permission to use this command!");
-        }
         int box;
         EntityPlayerMP player;
         PCStorage boxStorage;

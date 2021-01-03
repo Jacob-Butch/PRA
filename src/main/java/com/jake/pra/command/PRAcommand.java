@@ -2,7 +2,6 @@ package com.jake.pra.command;
 
 import com.google.common.collect.Lists;
 import com.jake.pra.PixelmonReforgedAdditions;
-import com.jake.pra.command.permissions.EnumPerms;
 import com.pixelmonmod.pixelmon.comm.CommandChatHandler;
 import net.minecraft.command.*;
 import net.minecraft.server.MinecraftServer;
@@ -18,7 +17,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class PRAcommand extends CommandBase implements ICommand {
-    private final List<String> aliases = Lists.newArrayList("pra");
 
     /* getCommandName */
     @Nonnull
@@ -35,14 +33,11 @@ public class PRAcommand extends CommandBase implements ICommand {
     /* getCommandAliases */
     @Nonnull
     public List<String> getAliases() {
-        return this.aliases;
+        return Lists.newArrayList("pra");
     }
 
     /* getTabCompletionOptions */
     public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args) throws CommandException {
-        if(!EnumPerms.hasPermission(EnumPerms.pra, sender)){
-            throw new WrongUsageException("You do not have permission to use this command!");
-        }
         if(args.length < 1) {
             throw new WrongUsageException(this.getUsage(sender));
         } else if(args[0].equals("help")) {

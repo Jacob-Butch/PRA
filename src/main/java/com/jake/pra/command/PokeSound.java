@@ -1,7 +1,6 @@
 package com.jake.pra.command;
 
 import com.google.common.collect.Lists;
-import com.jake.pra.command.permissions.EnumPerms;
 import com.pixelmonmod.pixelmon.comm.CommandChatHandler;
 import net.minecraft.command.*;
 import net.minecraft.util.SoundCategory;
@@ -18,7 +17,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 
 public class PokeSound extends CommandBase implements ICommand {
-    private final List<String> aliases = Lists.newArrayList("ps");
 
     @Nonnull
     public String getName()
@@ -36,13 +34,10 @@ public class PokeSound extends CommandBase implements ICommand {
 
     @Nonnull
     public List<String> getAliases() {
-        return this.aliases;
+        return Lists.newArrayList("ps");
     }
 
     public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args) throws CommandException {
-        if(!EnumPerms.hasPermission(EnumPerms.pokesound, sender)){
-            throw new WrongUsageException("You do not have permission to use this command!");
-        }
         if (args.length < 2) {
             throw new WrongUsageException(this.getUsage(sender));
         } else {

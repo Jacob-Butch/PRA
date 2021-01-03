@@ -1,7 +1,6 @@
 package com.jake.pra;
 
 import com.jake.pra.command.*;
-import com.jake.pra.command.permissions.EnumPerms;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.Config.LangKey;
 import net.minecraftforge.common.config.Config.Comment;
@@ -13,7 +12,7 @@ import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-@Mod(modid = "pradditions", name = "PRAdditions", version = "1.5", serverSideOnly = true,
+@Mod(modid = "pradditions", name = "PRAdditions", version = "1.6", serverSideOnly = true,
         dependencies = "required-after:pixelmon", acceptableRemoteVersions = "*"
 )
 public class PixelmonReforgedAdditions {
@@ -27,7 +26,6 @@ public class PixelmonReforgedAdditions {
     @EventHandler
     public void serverStarting(FMLServerStartingEvent event) {
         this.registerCommands(event);
-        EnumPerms.registerPermissions();
     }
 
     private void registerCommands(FMLServerStartingEvent event){

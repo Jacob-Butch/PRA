@@ -1,7 +1,6 @@
 package com.jake.pra.command;
 
 import com.google.common.collect.Lists;
-import com.jake.pra.command.permissions.EnumPerms;
 import com.pixelmonmod.pixelmon.comm.CommandChatHandler;
 import com.pixelmonmod.pixelmon.enums.EnumSpecies;
 import net.minecraft.command.*;
@@ -20,8 +19,6 @@ import net.minecraft.util.text.TextFormatting;
 
 public class PokeCry extends CommandBase implements ICommand {
 
-    private final List<String> aliases = Lists.newArrayList("cry");
-
     @Nonnull
     public String getName()
     {
@@ -36,14 +33,9 @@ public class PokeCry extends CommandBase implements ICommand {
     }
 
     @Nonnull
-    public List<String> getAliases() {
-        return this.aliases;
-    }
+    public List<String> getAliases() { return Lists.newArrayList("cry"); }
 
     public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args) throws CommandException {
-        if(!EnumPerms.hasPermission(EnumPerms.pokecry, sender)){
-            throw new WrongUsageException("You do not have permission to use this command!");
-        }
         if (args.length < 2) {
             throw new WrongUsageException(this.getUsage(sender));
         } else {
