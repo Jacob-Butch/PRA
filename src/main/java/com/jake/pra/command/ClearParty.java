@@ -43,10 +43,12 @@ public class ClearParty extends CommandBase implements ICommand {
 
     /* getTabCompletionOptions */
     public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args) throws CommandException {
+        // Party slot #
         int slot;
-        ArrayList<String> players = Lists.newArrayList(server.getOnlinePlayerNames());
+        // Target player
+        EntityPlayerMP player;
         if(args.length < 1) {
-            EntityPlayerMP player = getPlayer(server, sender, sender.getName());
+            player = getPlayer(server, sender, sender.getName());
             if (confirmcp.containsKey(player.getUniqueID())) {
                 confirmcp.remove(player.getUniqueID());
                 PlayerPartyStorage pStorage = Pixelmon.storageManager.getParty(player);
@@ -58,12 +60,12 @@ public class ClearParty extends CommandBase implements ICommand {
             }
         } else if (args.length == 1) {
             if (args[0].equals("1") || args[0].equals("2") || args[0].equals("3") || args[0].equals("4") || args[0].equals("5") || args[0].equals("6")) {
-                EntityPlayerMP player = getPlayer(server, sender, sender.getName());
+                player = getPlayer(server, sender, sender.getName());
                 PlayerPartyStorage pStorage = Pixelmon.storageManager.getParty(player);
                 slot = Integer.parseInt(args[0]) - 1;
                 clearAllButOne(pStorage, slot);
             } else {
-                EntityPlayerMP player = getPlayer(server, sender, args[0]);
+                player = getPlayer(server, sender, args[0]);
                 if(confirmcp.containsKey(player.getUniqueID())) {
                     confirmcp.remove(player.getUniqueID());
                     PlayerPartyStorage pStorage = Pixelmon.storageManager.getParty(player);
@@ -76,11 +78,13 @@ public class ClearParty extends CommandBase implements ICommand {
             }
         } else if(args.length == 2) {
             slot = Integer.parseInt(args[1]) - 1;
-            if(!players.contains(args[0])){
+            try {
+                player = getPlayer(server, sender, args[0]);
+            } catch (Exception ex){
+                // Player not found
                 CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "Invalid name, try again.");
                 return;
             }
-            EntityPlayerMP player = getPlayer(server, sender, args[0]);
             PlayerPartyStorage pStorage = Pixelmon.storageManager.getParty(player);
             clearAllButOne(pStorage, slot);
         } else {

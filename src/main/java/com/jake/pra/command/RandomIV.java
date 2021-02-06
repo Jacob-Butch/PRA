@@ -3,11 +3,9 @@ package com.jake.pra.command;
 import com.pixelmonmod.pixelmon.Pixelmon;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.pokemon.PokemonSpec;
-import com.pixelmonmod.pixelmon.api.storage.PCStorage;
 import com.pixelmonmod.pixelmon.battles.BattleRegistry;
 import com.pixelmonmod.pixelmon.comm.CommandChatHandler;
 import com.pixelmonmod.pixelmon.enums.EnumSpecies;
-import com.pixelmonmod.pixelmon.enums.items.EnumPokeballs;
 import com.pixelmonmod.pixelmon.storage.PlayerPartyStorage;
 import com.google.common.collect.Lists;
 import net.minecraft.command.*;
@@ -15,13 +13,13 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
-import scala.util.Random;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class RandomIV extends CommandBase implements ICommand {
 
@@ -48,24 +46,25 @@ public class RandomIV extends CommandBase implements ICommand {
         if(args.length < 4) {
             throw new WrongUsageException(this.getUsage(sender));
         }
-        int miniv, maxiv;                       //min and max iv values
-        int hp, atk, def, spatk, spdef, spd;    //iv values
-        String  pokemon;                        //target pokemon
-        EnumSpecies name;
-
-        pokemon = args[1];
+        // Min and Max IV values
+        int minIV, maxIV;
+        // IV values for each stat
+        int hp, atk, def, spAtk, spDef, spd;
+        // Target pokemon
+        String pokemon = args[1];
         if(args[2].equals(args[3])) {
-            hp = atk = def = spatk = spdef = spd = Integer.parseInt(args[3]);
+            hp = atk = def = spAtk = spDef = spd = Integer.parseInt(args[3]);
         } else {
-            miniv = Integer.parseInt(args[2]);
-            maxiv = Integer.parseInt(args[3]);
-            hp    = (int)(Math.random() * ((maxiv-miniv) + 1)) + miniv;
-            atk   = (int)(Math.random() * ((maxiv-miniv) + 1)) + miniv;
-            def   = (int)(Math.random() * ((maxiv-miniv) + 1)) + miniv;
-            spatk = (int)(Math.random() * ((maxiv-miniv) + 1)) + miniv;
-            spdef = (int)(Math.random() * ((maxiv-miniv) + 1)) + miniv;
-            spd   = (int)(Math.random() * ((maxiv-miniv) + 1)) + miniv;
+            minIV = Integer.parseInt(args[2]);
+            maxIV = Integer.parseInt(args[3]);
+            hp    = (int) (Math.random() * ((maxIV - minIV) + 1)) + minIV;
+            atk   = (int) (Math.random() * ((maxIV - minIV) + 1)) + minIV;
+            def   = (int) (Math.random() * ((maxIV - minIV) + 1)) + minIV;
+            spAtk = (int) (Math.random() * ((maxIV - minIV) + 1)) + minIV;
+            spDef = (int) (Math.random() * ((maxIV - minIV) + 1)) + minIV;
+            spd   = (int) (Math.random() * ((maxIV - minIV) + 1)) + minIV;
         }
+        // Fill in specs
         int i = args.length;
         int n = i + 6;
         String[] specs = new String[n];
@@ -73,55 +72,47 @@ public class RandomIV extends CommandBase implements ICommand {
         specs[i] = ("ivhp:" + hp);
         specs[i + 1] = ("ivattack:" + atk);
         specs[i + 2] = ("ivdefence:" + def);
-        specs[i + 3] = ("ivspecialattack:" + spatk);
-        specs[i + 4] = ("ivspecialdefence:" + spdef);
+        specs[i + 3] = ("ivspecialattack:" + spAtk);
+        specs[i + 4] = ("ivspecialdefence:" + spDef);
         specs[i + 5] = ("ivspeed:" + spd);
-
+        // Target player
         EntityPlayerMP player = getPlayer(server, sender, args[0]);
-        if(pokemon.equals("random")) {
-            int legendchance;
-            java.util.Random rand = new java.util.Random();
-            legendchance = rand.nextInt(100);
-            if(legendchance > 0) {
-                name = EnumSpecies.randomPoke();
+        // Pokemon's species
+        EnumSpecies species;
+        if(pokemon.equalsIgnoreCase("random")) {
+            int legendChance;
+            legendChance = new Random().nextInt(100);
+            if(legendChance > 0) {
+                species = EnumSpecies.randomPoke();
             } else {
-                int sizeleg = EnumSpecies.legendaries.size();
-                int random = (new Random()).nextInt(sizeleg);
-                name = EnumSpecies.getFromNameAnyCase(EnumSpecies.legendaries.get(random));
-            }
-            Pokemon p = Pixelmon.pokemonFactory.create(name);
-            PokemonSpec spec = PokemonSpec.from(specs);
-            p.setCaughtBall(EnumPokeballs.PokeBall);
-            spec.apply(p);
-            PlayerPartyStorage storage = Pixelmon.storageManager.getParty(player);
-            if (BattleRegistry.getBattle(player) == null) {
-                storage.add(p);
-            } else {
-                PCStorage pcStorage = Pixelmon.storageManager.getPCForPlayer(player);
-                pcStorage.add(p);
+                int random = new Random().nextInt(EnumSpecies.legendaries.size());
+                species = EnumSpecies.getFromNameAnyCase(EnumSpecies.legendaries.get(random));
             }
         } else {
-            name = EnumSpecies.getFromNameAnyCase(pokemon);
-            Pokemon p = Pixelmon.pokemonFactory.create(name);
-            PokemonSpec spec = PokemonSpec.from(specs);
-            p.setCaughtBall(EnumPokeballs.PokeBall);
-            spec.apply(p);
-            PlayerPartyStorage storage = Pixelmon.storageManager.getParty(player);
-            if (BattleRegistry.getBattle(player) == null) {
-                storage.add(p);
-            } else {
-                PCStorage pcStorage = Pixelmon.storageManager.getPCForPlayer(player);
-                pcStorage.add(p);
-            }
-            CommandChatHandler.sendFormattedChat(player, TextFormatting.GREEN, "You were given a " + p.getDisplayName() + "!");
+            species = EnumSpecies.getFromNameAnyCase(pokemon);
         }
+        // Create pokemon
+        Pokemon poke = Pixelmon.pokemonFactory.create(species);
+        PokemonSpec spec = PokemonSpec.from(specs);
+        spec.apply(poke);
+        PlayerPartyStorage storage = Pixelmon.storageManager.getParty(player);
+        if (BattleRegistry.getBattle(player) == null) {
+            // Add pokemon to player's party
+            storage.add(poke);
+        } else {
+            // Add pokemon to player's PC
+            Pixelmon.storageManager.getPCForPlayer(player).add(poke);
+        }
+        CommandChatHandler.sendFormattedChat(player, TextFormatting.GREEN, "You were given a " + poke.getDisplayName() + "!");
     }
 
     @Nonnull
     public List<String> getTabCompletions(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args, @Nullable BlockPos targetPos){
         if (args.length == 1) {
+            // Player argument
             return getListOfStringsMatchingLastWord(args, server.getOnlinePlayerNames());
         } else if (args.length == 2){
+            // Pokemon argument
             List<String> pokes = new ArrayList<>();
             for (EnumSpecies poke : EnumSpecies.values()) {
                 pokes.add(poke.name);

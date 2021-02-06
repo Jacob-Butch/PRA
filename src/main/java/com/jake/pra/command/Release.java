@@ -48,7 +48,9 @@ public class Release extends CommandBase implements ICommand {
 
     /* getTabCompletionOptions */
     public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args) throws CommandException {
+        // Box and Slot #
         int box, slot;
+        // Target Player
         EntityPlayerMP player;
         if((args.length < 1) || (args.length > 3)) {
             throw new WrongUsageException(this.getUsage(sender));
@@ -78,6 +80,7 @@ public class Release extends CommandBase implements ICommand {
 
     @Nonnull
     public List<String> getTabCompletions(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args, @Nullable BlockPos targetPos){
+        // Player argument
         return args.length == 1 ? getListOfStringsMatchingLastWord(args, server.getOnlinePlayerNames()) : new ArrayList<>();
     }
 

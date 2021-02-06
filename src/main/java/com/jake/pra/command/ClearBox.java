@@ -45,14 +45,14 @@ public class ClearBox extends CommandBase implements ICommand {
 
     /* getTabCompletionOptions */
     public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args) throws CommandException {
+        // Box #
         int box;
+        // Target Player
         EntityPlayerMP player;
-        PCStorage boxStorage;
-        ArrayList<String> players = Lists.newArrayList(server.getOnlinePlayerNames());
+        // Online players
          if (args.length == 1) {
             if (isBox(args[0])) {
                 player = getPlayer(server, sender, sender.getName());
-                boxStorage = Pixelmon.storageManager.getPCForPlayer(player);
                 box = Integer.parseInt(args[0]) - 1;
             } else {
                 getUsage(sender);
@@ -60,12 +60,13 @@ public class ClearBox extends CommandBase implements ICommand {
             }
         } else if(args.length == 2) {
             box = Integer.parseInt(args[1]) - 1;
-            if(!players.contains(args[0])){
+            try {
+                player = getPlayer(server, sender, args[0]);
+            } catch (Exception ex) {
+                // Player not found
                 CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "Invalid name, try again.");
                 return;
             }
-            player = getPlayer(server, sender, args[0]);
-            boxStorage = Pixelmon.storageManager.getPCForPlayer(player);
         } else {
              throw new WrongUsageException(this.getUsage(sender));
         }
@@ -78,7 +79,7 @@ public class ClearBox extends CommandBase implements ICommand {
             return;
 
         }
-        clearBox(boxStorage, box);
+        clearBox(Pixelmon.storageManager.getPCForPlayer(player), box);
         if(args.length == 1) {
             CommandChatHandler.sendFormattedChat(sender, TextFormatting.DARK_AQUA, "Box " + args[0] + " has been cleared!");
         }
@@ -96,9 +97,7 @@ public class ClearBox extends CommandBase implements ICommand {
         return new ArrayList<>();
     }
 
-    public boolean isUsernameIndex(@Nonnull String[] args, int i) {
-        return false;
-    }
+    public boolean isUsernameIndex(@Nonnull String[] args, int i) { return false; }
 
     private static boolean isBox(String arg) {
         int box = Integer.parseInt(arg) - 1;

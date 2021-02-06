@@ -17,6 +17,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.jake.pra.PixelmonReforgedAdditions.CONFIG.legendRerollKeepIVs;
@@ -50,136 +51,119 @@ public class RerollIV extends CommandBase implements ICommand {
         if(args.length != 2 && args.length != 4) {
             throw new WrongUsageException(this.getUsage(sender));
         } else {
+            EntityPlayerMP player;
             try {
-                EntityPlayerMP player = getPlayer(server, sender, args[0]);
-                PlayerPartyStorage partyStorage = Pixelmon.storageManager.getParty(player);
-                int minIV, maxIV;                       //min and max iv values
-                int hp, atk, def, spatk, spdef, spd;    //iv values
-                String hpiv, atkiv, defiv, spatkiv, spdefiv, spdiv;
-                String slot;                   //target player and target slot
-                int slotInt;                            //integer for slot
-                Pokemon poke;
-                EnumSpecies pokemon;
-
-                slot = args[1];
-                if (!slot.equals("1") && !slot.equals("2") && !slot.equals("3") && !slot.equals("4") && !slot.equals("5") && !slot.equals("6") && !slot.toLowerCase().equals("random")) {
+                player = getPlayer(server, sender, args[0]);
+            } catch (PlayerNotFoundException ex) {
+                CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "Invalid Name! Try again!");
+                return;
+            }
+            int slot;
+            if(args[1].equalsIgnoreCase("random")){
+                slot = (int) ((Math.random() * 6) + 1);
+            } else {
+                try {
+                    slot = Integer.parseInt(args[1]);
+                } catch (NumberFormatException ex){
+                    CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "Invalid number given!");
+                    return;
+                }
+                if(slot < 1 || slot > 6){
                     CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "Invalid slot choice. Must be 1-6 or random");
                     return;
                 }
-
-                if (!slot.equals("1") && !slot.equals("2") && !slot.equals("3") && !slot.equals("4") && !slot.equals("5") && !slot.equals("6")) {
-                    slotInt = (int) (Math.random() * ((6 - 1) + 1) + 1);
-                    poke = partyStorage.get(slotInt - 1);
-                }
-                else {
-                    slotInt = Integer.parseInt(slot);
-                    poke = partyStorage.get(slotInt - 1);
-                }
-                assert poke != null;
-                pokemon = poke.getSpecies();
-                String[] specs = new String[6];
-                if (args.length == 2) {
-                    hp = (int) (Math.random() * (32));
-                    atk = (int) (Math.random() * (32));
-                    def = (int) (Math.random() * (32));
-                    spatk = (int) (Math.random() * (32));
-                    spdef = (int) (Math.random() * (32));
-                    spd = (int) (Math.random() * (32));
-                }
-                if (args.length == 4) {
-                    if (args[2].equals(args[3])) {
-                        hp = atk = def = spatk = spdef = spd = Integer.parseInt(args[3]);
-                    } else {
-                        minIV = Integer.parseInt(args[2]);
-                        maxIV = Integer.parseInt(args[3]);
-                        hp = (int) (Math.random() * ((maxIV - minIV) + 1)) + minIV;
-                        atk = (int) (Math.random() * ((maxIV - minIV) + 1)) + minIV;
-                        def = (int) (Math.random() * ((maxIV - minIV) + 1)) + minIV;
-                        spatk = (int) (Math.random() * ((maxIV - minIV) + 1)) + minIV;
-                        spdef = (int) (Math.random() * ((maxIV - minIV) + 1)) + minIV;
-                        spd = (int) (Math.random() * ((maxIV - minIV) + 1)) + minIV;
-                    }
-                } else {
-                    CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "Invalid amount of arguments.");
-                    return;
-                }
-                hpiv = ("ivhp:" + hp);
-                atkiv = ("ivattack:" + atk);
-                defiv = ("ivdefence:" + def);
-                spatkiv = ("ivspecialattack:" + spatk);
-                spdefiv = ("ivspecialdefence:" + spdef);
-                spdiv = ("ivspeed:" + spd);
-                if(legendaries.contains(pokemon.name) && legendRerollKeepIVs) {
-                    int iv1, iv2, iv3;
-                    iv1 = (int) (Math.random() * ((6 - 1) + 1) + 1);
-                    iv2 = iv1;
-                    while(iv2 == iv1) {
-                        iv2 = (int) (Math.random() * ((6 - 1) + 1) + 1);
-                    }
-                    iv3 = iv2;
-                    while(iv3 == iv2 || iv3 == iv1) {
-                        iv3 = (int) (Math.random() * ((6 - 1) + 1) + 1);
-                    }
-                    if(iv1 == 1 || iv2 == 1 || iv3 == 1) {
-                        hpiv = ("ivhp:31");
-                    }
-                    if(iv1 == 2 || iv2 == 2 || iv3 == 2) {
-                        atkiv = ("ivattack:31");
-                    }
-                    if(iv1 == 3 || iv2 == 3 || iv3 == 3) {
-                        defiv = ("ivdefence:31");
-                    }
-                    if(iv1 == 4 || iv2 == 4 || iv3 == 4) {
-                        spatkiv = ("ivspecialattack:31");
-                    }
-                    if(iv1 == 5 || iv2 == 5 || iv3 == 5) {
-                        spdefiv = ("ivspecialdefence:31");
-                    }
-                    if(iv1 == 6 || iv2 == 6 || iv3 == 6) {
-                        spdiv = ("ivspeed:31");
-                    }
-                }
-                specs[0] = hpiv;
-                specs[1] = atkiv;
-                specs[2] = defiv;
-                specs[3] = spatkiv;
-                specs[4] = spdefiv;
-                specs[5] = spdiv;
-
-                partyStorage.retrieveAll();
-                PokemonSpec spec = PokemonSpec.from(specs);
-                spec.apply(poke);
-                partyStorage.set(slotInt - 1, poke);
-                CommandChatHandler.sendFormattedChat(sender, TextFormatting.GREEN, "Your " + pokemon.name + "'s IVs have been rerolled.");
-            } catch (PlayerNotFoundException var9) {
-                CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "Invalid Name! Try again!");
-            } catch (NumberFormatException var10) {
-                CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "Invalid number given!");
             }
+            PlayerPartyStorage partyStorage = Pixelmon.storageManager.getParty(player);
+            Pokemon poke = partyStorage.get(slot - 1);
+            if(poke == null){
+                CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "There is no pokemon in that slot!");
+                return;
+            }
+            // Species of pokemon
+            EnumSpecies species = poke.getSpecies();
+            // Min and Max IV values
+            int minIV, maxIV;
+            // IV values for each stat
+            int hp, atk, def, spAtk, spDef, spd;
+            String hpIV, atkIV, defIV, spatkIV, spdefIV, spdIV;
+
+            String[] specs = new String[6];
+            if (args.length == 2) {
+                hp = (int) (Math.random() * (32));
+                atk = (int) (Math.random() * (32));
+                def = (int) (Math.random() * (32));
+                spAtk = (int) (Math.random() * (32));
+                spDef = (int) (Math.random() * (32));
+                spd = (int) (Math.random() * (32));
+            }
+            if (args.length == 4) {
+                if (args[2].equals(args[3])) {
+                    hp = atk = def = spAtk = spDef = spd = Integer.parseInt(args[3]);
+                } else {
+                    minIV = Integer.parseInt(args[2]);
+                    maxIV = Integer.parseInt(args[3]);
+                    hp = (int) (Math.random() * ((maxIV - minIV) + 1)) + minIV;
+                    atk = (int) (Math.random() * ((maxIV - minIV) + 1)) + minIV;
+                    def = (int) (Math.random() * ((maxIV - minIV) + 1)) + minIV;
+                    spAtk = (int) (Math.random() * ((maxIV - minIV) + 1)) + minIV;
+                    spDef = (int) (Math.random() * ((maxIV - minIV) + 1)) + minIV;
+                    spd = (int) (Math.random() * ((maxIV - minIV) + 1)) + minIV;
+                }
+            } else {
+                CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "Invalid amount of arguments.");
+                return;
+            }
+            hpIV = ("ivhp:" + hp);
+            atkIV = ("ivattack:" + atk);
+            defIV = ("ivdefence:" + def);
+            spatkIV = ("ivspecialattack:" + spAtk);
+            spdefIV = ("ivspecialdefence:" + spDef);
+            spdIV = ("ivspeed:" + spd);
+            if(legendaries.contains(species.name) && legendRerollKeepIVs) {
+                int iv1, iv2, iv3;
+                iv1 = (int) (Math.random() * ((6 - 1) + 1) + 1);
+                iv2 = iv1;
+                while(iv2 == iv1) {
+                    iv2 = (int) (Math.random() * ((6 - 1) + 1) + 1);
+                }
+                iv3 = iv2;
+                while(iv3 == iv2 || iv3 == iv1) {
+                    iv3 = (int) (Math.random() * ((6 - 1) + 1) + 1);
+                }
+                if(iv1 == 1 || iv2 == 1 || iv3 == 1) hpIV = ("ivhp:31");
+                if(iv1 == 2 || iv2 == 2 || iv3 == 2) atkIV = ("ivattack:31");
+                if(iv1 == 3 || iv2 == 3 || iv3 == 3) defIV = ("ivdefence:31");
+                if(iv1 == 4 || iv2 == 4 || iv3 == 4) spatkIV = ("ivspecialattack:31");
+                if(iv1 == 5 || iv2 == 5 || iv3 == 5) spdefIV = ("ivspecialdefence:31");
+                if(iv1 == 6 || iv2 == 6 || iv3 == 6) spdIV = ("ivspeed:31");
+            }
+            specs[0] = hpIV;
+            specs[1] = atkIV;
+            specs[2] = defIV;
+            specs[3] = spatkIV;
+            specs[4] = spdefIV;
+            specs[5] = spdIV;
+
+            partyStorage.retrieveAll();
+            PokemonSpec spec = PokemonSpec.from(specs);
+            spec.apply(poke);
+            partyStorage.set(slot - 1, poke);
+
+            CommandChatHandler.sendFormattedChat(sender, TextFormatting.GREEN, "Your " + spec.name + "'s IVs have been rerolled.");
         }
     }
 
     @Nonnull
     public List<String> getTabCompletions(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args, @Nullable BlockPos targetPos) {
         if (args.length == 1) {
+            // Player Argument
             return getListOfStringsMatchingLastWord(args, server.getOnlinePlayerNames());
-        }
-        else if(args.length == 2) {
-            List<String> slots = new ArrayList<>();
-            slots.add("1");
-            slots.add("2");
-            slots.add("3");
-            slots.add("4");
-            slots.add("5");
-            slots.add("6");
-            slots.add("random");
-
-            return getListOfStringsMatchingLastWord(args, slots);
+        } else if(args.length == 2) {
+            // Slot argument
+            return getListOfStringsMatchingLastWord(args, Arrays.asList("1", "2", "3", "4", "5", "6", "random"));
         }
         return new ArrayList<>();
     }
 
-    public boolean isUsernameIndex(@Nonnull String[] args, int i) {
-        return false;
-    }
+    public boolean isUsernameIndex(@Nonnull String[] args, int i) { return false; }
 }

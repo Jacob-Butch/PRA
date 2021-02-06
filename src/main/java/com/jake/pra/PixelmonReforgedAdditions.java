@@ -19,6 +19,7 @@ public class PixelmonReforgedAdditions {
 
     @EventHandler
     public void init(FMLInitializationEvent event) {
+        // Load and sync the config
         ConfigManager.load("pradditions", Type.INSTANCE);
         ConfigManager.sync("pradditions", Type.INSTANCE);
     }
@@ -53,6 +54,7 @@ public class PixelmonReforgedAdditions {
 
     @SubscribeEvent
     public static void onConfigChanged(final OnConfigChangedEvent event) {
+        // Sync changes when the config is changed
         if (event.getModID().equals("pradditions")) {
             ConfigManager.sync("pradditions", Type.INSTANCE);
         }
